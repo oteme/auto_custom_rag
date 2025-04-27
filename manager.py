@@ -1,6 +1,9 @@
 # manager.py
 
 from registry import ModuleRegistry
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class PipelineManager:
     def __init__(self, config: dict):
@@ -15,6 +18,7 @@ class PipelineManager:
         self.reranker = None
         self.prompt_template = None
         self.postprocessors = []
+        self.model = None
 
     def initialize_pipeline(self):
         # Data Pipeline
@@ -59,6 +63,12 @@ class PipelineManager:
         prompt_template_name = self.config["generation_pipeline"]["prompt_template"]
         postprocessor_names = self.config["generation_pipeline"]["postprocessors"]
 
+        # --- ★ NEW: Model Layer ---
+        model_name = self.config.get("model", {}).get("name", "openai_model")
+        model_params = self.config.get("model", {}).get("params", {})
+        ModelClass = ModuleRegistry.get_class(model_name)
+        self.model = ModelClass(**model_params)
+
         PromptTemplateClass = ModuleRegistry.get_class(prompt_template_name)
         self.prompt_template = PromptTemplateClass()
 
@@ -68,6 +78,7 @@ class PipelineManager:
             self.postprocessors.append(postprocessor_instance)
 
     def ingest(self):
+        all_chunks = []
         for loader in self.loaders:
             raw_docs = loader.load()
             for raw_doc in raw_docs:
@@ -76,7 +87,12 @@ class PipelineManager:
                 chunks = self.chunker.chunk(normalized_doc)
                 for chunk in chunks:
                     vector = self.embedder.embed(chunk)
-                    # 今はダミーなのでベクトル保存しない
+                
+                all_chunks.extend(chunks)
+        
+        # Retriever にベクトル登録 (任意メソッド存在チェック)
+        if hasattr(self.retriever, "ingest"):
+            self.retriever.ingest(all_chunks, self.embedder)
 
     def query(self, user_query: str):
         retrieved_chunks = self.retriever.retrieve(user_query)
@@ -88,12 +104,11 @@ class PipelineManager:
         reranked_chunks = self.reranker.rerank(filtered_chunks, user_query)
         prompt = self.prompt_template.format_prompt(user_query, reranked_chunks)
 
-        # ダミーのLLMレスポンス（本来はLLMにpromptを投げる）
-        dummy_llm_response = f"Generated answer based on prompt: {prompt[:30]}..."
+        # --- 🔥 モデル呼び出し ---
+        llm_response = self.model.generate(prompt)
 
-        final_response = dummy_llm_response
+        final_response = llm_response
         for postprocessor in self.postprocessors:
             final_response = postprocessor.postprocess(final_response)
 
-        print("Final Response:")
-        print(final_response)
+        print("Final Response:\n" + final_response)
