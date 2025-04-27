@@ -1,9 +1,6 @@
 # manager.py
 
 from registry import ModuleRegistry
-from dotenv import load_dotenv
-
-load_dotenv()
 
 class PipelineManager:
     def __init__(self, config: dict):
@@ -22,75 +19,76 @@ class PipelineManager:
 
     def initialize_pipeline(self):
         # Data Pipeline
-        loader_names = self.config["data_pipeline"]["loaders"]
-        parser_name = self.config["data_pipeline"]["parser"]
-        normalizer_name = self.config["data_pipeline"]["normalizer"]
-        chunker_name = self.config["data_pipeline"]["chunker"]
-        embedder_name = self.config["data_pipeline"]["embedder"]
+        data_cfg = self.config["data_pipeline"]
 
-        for loader_name in loader_names:
+        for loader_name in data_cfg["loaders"]:
             LoaderClass = ModuleRegistry.get_class(loader_name)
-            loader_instance = LoaderClass(path="sample_data/")
+            loader_params = data_cfg.get("loader_params", {}).get(loader_name, {})
+            loader_instance = LoaderClass(**loader_params)
             self.loaders.append(loader_instance)
 
-        ParserClass = ModuleRegistry.get_class(parser_name)
-        NormalizerClass = ModuleRegistry.get_class(normalizer_name)
-        ChunkerClass = ModuleRegistry.get_class(chunker_name)
-        EmbedderClass = ModuleRegistry.get_class(embedder_name)
+        ParserClass = ModuleRegistry.get_class(data_cfg["parser"])
+        parser_params = data_cfg.get("parser_params", {}).get(data_cfg["parser"], {})
+        self.parser = ParserClass(**parser_params)
 
-        self.parser = ParserClass()
-        self.normalizer = NormalizerClass()
-        self.chunker = ChunkerClass()
-        self.embedder = EmbedderClass()
+        NormalizerClass = ModuleRegistry.get_class(data_cfg["normalizer"])
+        normalizer_params = data_cfg.get("normalizer_params", {}).get(data_cfg["normalizer"], {})
+        self.normalizer = NormalizerClass(**normalizer_params)
+
+        ChunkerClass = ModuleRegistry.get_class(data_cfg["chunker"])
+        chunker_params = data_cfg.get("chunker_params", {}).get(data_cfg["chunker"], {})
+        self.chunker = ChunkerClass(**chunker_params)
+
+        EmbedderClass = ModuleRegistry.get_class(data_cfg["embedder"])
+        embedder_params = data_cfg.get("embedder_params", {}).get(data_cfg["embedder"], {})
+        self.embedder = EmbedderClass(**embedder_params)
 
         # Retrieval Pipeline
-        retriever_name = self.config["retrieval_pipeline"]["retriever"]
-        filter_names = self.config["retrieval_pipeline"]["filters"]
-        reranker_name = self.config["retrieval_pipeline"]["reranker"]
+        retrieval_cfg = self.config["retrieval_pipeline"]
 
-        RetrieverClass = ModuleRegistry.get_class(retriever_name)
-        self.retriever = RetrieverClass()
+        RetrieverClass = ModuleRegistry.get_class(retrieval_cfg["retriever"])
+        retriever_params = retrieval_cfg.get("retriever_params", {})
+        self.retriever = RetrieverClass(**retriever_params)
 
-        for filter_name in filter_names:
+        for filter_name in retrieval_cfg["filters"]:
             FilterClass = ModuleRegistry.get_class(filter_name)
-            filter_instance = FilterClass()
+            filter_params = retrieval_cfg.get("filter_params", {}).get(filter_name, {})
+            filter_instance = FilterClass(**filter_params)
             self.filters.append(filter_instance)
 
-        RerankerClass = ModuleRegistry.get_class(reranker_name)
-        self.reranker = RerankerClass()
+        RerankerClass = ModuleRegistry.get_class(retrieval_cfg["reranker"])
+        reranker_params = retrieval_cfg.get("reranker_params", {}).get(retrieval_cfg["reranker"], {})
+        self.reranker = RerankerClass(**reranker_params)
 
         # Generation Pipeline
-        prompt_template_name = self.config["generation_pipeline"]["prompt_template"]
-        postprocessor_names = self.config["generation_pipeline"]["postprocessors"]
+        generation_cfg = self.config["generation_pipeline"]
 
-        # --- ★ NEW: Model Layer ---
-        model_name = self.config.get("model", {}).get("name", "openai_model")
-        model_params = self.config.get("model", {}).get("params", {})
-        ModelClass = ModuleRegistry.get_class(model_name)
-        self.model = ModelClass(**model_params)
+        PromptTemplateClass = ModuleRegistry.get_class(generation_cfg["prompt_template"])
+        prompt_params = generation_cfg.get("prompt_template_params", {}).get(generation_cfg["prompt_template"], {})
+        self.prompt_template = PromptTemplateClass(**prompt_params)
 
-        PromptTemplateClass = ModuleRegistry.get_class(prompt_template_name)
-        self.prompt_template = PromptTemplateClass()
-
-        for postprocessor_name in postprocessor_names:
+        for postprocessor_name in generation_cfg["postprocessors"]:
             PostProcessorClass = ModuleRegistry.get_class(postprocessor_name)
-            postprocessor_instance = PostProcessorClass()
+            postprocessor_params = generation_cfg.get("postprocessor_params", {}).get(postprocessor_name, {})
+            postprocessor_instance = PostProcessorClass(**postprocessor_params)
             self.postprocessors.append(postprocessor_instance)
+
+        # Model (optional)
+        model_cfg = self.config.get("model")
+        if model_cfg:
+            ModelClass = ModuleRegistry.get_class(model_cfg["name"])
+            model_params = model_cfg.get("params", {})
+            self.model = ModelClass(**model_params)
 
     def ingest(self):
         all_chunks = []
         for loader in self.loaders:
-            raw_docs = loader.load()
-            for raw_doc in raw_docs:
+            for raw_doc in loader.load():
                 parsed_doc = self.parser.parse(raw_doc)
                 normalized_doc = self.normalizer.normalize(parsed_doc)
                 chunks = self.chunker.chunk(normalized_doc)
-                for chunk in chunks:
-                    vector = self.embedder.embed(chunk)
-                
                 all_chunks.extend(chunks)
-        
-        # Retriever にベクトル登録 (任意メソッド存在チェック)
+
         if hasattr(self.retriever, "ingest"):
             self.retriever.ingest(all_chunks, self.embedder)
 
@@ -104,11 +102,11 @@ class PipelineManager:
         reranked_chunks = self.reranker.rerank(filtered_chunks, user_query)
         prompt = self.prompt_template.format_prompt(user_query, reranked_chunks)
 
-        # --- 🔥 モデル呼び出し ---
-        llm_response = self.model.generate(prompt)
+        llm_response = self.model.generate(prompt) if self.model else f"Dummy response for prompt: {prompt[:30]}..."
 
         final_response = llm_response
         for postprocessor in self.postprocessors:
             final_response = postprocessor.postprocess(final_response)
 
-        print("Final Response:\n" + final_response)
+        print("Final Response:")
+        print(final_response)

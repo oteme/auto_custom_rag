@@ -7,15 +7,18 @@ load_dotenv()
 
 class OpenAIModel:
     def __init__(self, model="gpt-4o", temperature=0.0, **kwargs):
-        api_base = os.getenv("AOAI_API_BASE")
-        if api_base:  # Azure OpenAI
+        # Azure APIを使用するフラグ - デフォルトではFalseに設定
+        use_azure = kwargs.pop('use_azure', False)
+        
+        if use_azure and os.getenv("AOAI_API_BASE"):  # Azure OpenAIを明示的に指定した場合のみ
             openai.AzureOpenAI.api_key = os.getenv("AOAI_API_KEY")
-            openai.AzureOpenAI.api_base = api_base
+            openai.AzureOpenAI.api_base = os.getenv("AOAI_API_BASE")
             openai.AzureOpenAI.api_version = os.getenv("AOAI_API_VERSION", "2023-12-01-preview")
             self._client = openai.AzureOpenAI()
-        else:  # OpenAI public
+        else:  # 標準のOpenAI
             openai.api_key = os.getenv("OPENAI_API_KEY")
             self._client = openai.Client()
+        
         self.model = model
         self.temperature = temperature
         self.completion_kwargs = kwargs

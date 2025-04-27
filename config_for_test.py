@@ -8,7 +8,7 @@ config = {
         "embedder": "simple_embedder",
     },
     "retrieval_pipeline": {
-        "retriever": "simple_retriever",
+        "retriever": "faiss_retriever",
         "filters": ["simple_filter"],
         "reranker": "simple_reranker",
     },

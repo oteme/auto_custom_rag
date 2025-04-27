@@ -8,7 +8,13 @@ class SimplePromptTemplate:
 
     def format_prompt(self, query, context_chunks):
         print(f"[SimplePromptTemplate] Formatting prompt for query: {query}")
-        context = "\n".join(context_chunks)
+        
+        context_texts = [
+            chunk["text"] if isinstance(chunk, dict) else chunk
+            for chunk in context_chunks
+        ]
+        context = "\n".join(context_texts)
+
         prompt = (
             f"Use the following context to answer the question:\n"
             f"{context}\n\n"
@@ -16,5 +22,4 @@ class SimplePromptTemplate:
         )
         return prompt
 
-# 起動時にレジストリ登録
 ModuleRegistry.register("simple_prompt_template", SimplePromptTemplate)

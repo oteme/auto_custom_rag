@@ -23,7 +23,7 @@ class ModuleRegistry:
     def _dynamic_import(cls, name):
         # どのカテゴリに属するか推測する
         for category in ["loaders", "parsers", "normalizers", "chunkers", "embedders",
-                         "retrievers", "filters", "rerankers", "prompts", "postprocessors"]:
+                        "retrievers", "filters", "rerankers", "prompts", "postprocessors", "models"]:
             try:
                 importlib.import_module(f"modules.{category}.{name}")
                 print(f"[Registry] Dynamically imported modules.{category}.{name}")

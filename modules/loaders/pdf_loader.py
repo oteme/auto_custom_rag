@@ -5,7 +5,7 @@ import fitz  # PyMuPDF
 from registry import ModuleRegistry
 
 class PDFLoader:
-    def __init__(self, path="sample_data/"):
+    def __init__(self, path="data/pdfs/"):
         self.path = path
 
     def load(self):
