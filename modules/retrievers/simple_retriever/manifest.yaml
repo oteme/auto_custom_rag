@@ -1,0 +1,16 @@
+# modules/retrievers/simple_retriever.yaml
+name: simple_retriever
+type: retriever
+description: NumpyとScipyを使用して単純なベクトル検索を行うRetrieverモジュール。ingestメソッドでチャンク文字列をEmbedderを用いてベクトル化しメモリ上に保持する。retrieveメソッドでクエリ文字列（内部でダミーベクトル化）とのコサイン類似度を計算し、類似度の高い上位のチャンク文字列リストを検索結果として返す。
+inputs:
+  - name: query # retrieveメソッドの入力
+    type: str
+outputs:
+  - name: retrieved_chunks # retrieveメソッドの出力
+    type: List[str]
+dependencies:
+  - numpy
+  - scipy
+author: "Auto-Generated"
+license: "MIT"
+version: "1.0.0"

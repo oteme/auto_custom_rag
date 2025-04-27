@@ -18,6 +18,7 @@ class PipelineManager:
         self.model = None
 
     def initialize_pipeline(self):
+        self.check_pipeline_compatibility()
         # Data Pipeline
         data_cfg = self.config["data_pipeline"]
 
@@ -110,3 +111,36 @@ class PipelineManager:
 
         print("Final Response:")
         print(final_response)
+
+    def check_pipeline_compatibility(self):
+        print("[Manager] Checking pipeline compatibility...")
+
+        data_cfg = self.config["data_pipeline"]
+        module_sequence = []
+
+        for loader_name in data_cfg["loaders"]:
+            module_sequence.append(loader_name)
+        module_sequence.append(data_cfg["parser"])
+        module_sequence.append(data_cfg["normalizer"])
+        module_sequence.append(data_cfg["chunker"])
+        module_sequence.append(data_cfg["embedder"])
+
+        previous_outputs = None
+        previous_module = None
+
+        for module_name in module_sequence:
+            metadata = ModuleRegistry.get_metadata(module_name)
+            inputs = metadata.get("inputs", [])
+            outputs = metadata.get("outputs", [])
+
+            if previous_outputs is not None:
+                prev_types = [item["type"] for item in previous_outputs]
+                curr_types = [item["type"] for item in inputs]
+
+                if not any(pt in curr_types for pt in prev_types):
+                    print(f"[WARNING] 型不一致: {previous_module} -> {module_name}")
+                    print(f"  出力型: {prev_types}")
+                    print(f"  入力型: {curr_types}")
+
+            previous_outputs = outputs
+            previous_module = module_name

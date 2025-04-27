@@ -1,0 +1,16 @@
+# modules/filters/dummy_filter.yaml
+name: dummy_filter
+type: filter
+description: チャンク文字列リストとクエリ文字列を受け取り、クエリに"tree"が含まれる場合に関連するチャンク（"tree"を含むチャンク）のみをフィルタリングして返すダミーモジュール。該当がない場合は元のリストを返す。
+inputs:
+  - name: chunks
+    type: List[str]
+  - name: query
+    type: str
+outputs:
+  - name: filtered_chunks
+    type: List[str]
+dependencies: []
+author: "Auto-Generated"
+license: "MIT"
+version: "1.0.0"

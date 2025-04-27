@@ -1,0 +1,16 @@
+# modules/filters/simple_filter.yaml
+name: simple_filter
+type: filter
+description: チャンクリスト（要素は文字列または辞書）とクエリ文字列を受け取り、クエリキーワード（小文字）がテキストに含まれるチャンクのみをフィルタリングして返すモジュール。該当がない場合は元のリストを返す。
+inputs:
+  - name: chunks
+    type: List[Union[str, dict]]
+  - name: query
+    type: str
+outputs:
+  - name: filtered_chunks
+    type: List[Union[str, dict]]
+dependencies: []
+author: "Auto-Generated"
+license: "MIT"
+version: "1.0.0"

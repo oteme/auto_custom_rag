@@ -1,0 +1,16 @@
+# modules/models/local_hf_model.yaml
+name: local_hf_model
+type: model
+description: Hugging Face Transformersライブラリを使用し、ローカル環境（CPU/GPU）で指定されたモデルを実行して、与えられたプロンプトに対するテキスト応答を生成するモジュール。
+inputs:
+  - name: prompt
+    type: str
+outputs:
+  - name: response
+    type: str
+dependencies:
+  - transformers
+  - accelerate # 推奨される依存関係
+author: "Auto-Generated"
+license: "MIT"
+version: "1.0.0"

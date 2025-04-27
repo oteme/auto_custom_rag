@@ -1,0 +1,13 @@
+# modules/loaders/pdf_loader.yaml
+name: pdf_loader
+type: loader
+description: 指定されたディレクトリパスからPDFファイルを読み込み、各PDFから抽出したテキストコンテンツのリスト（文字列）を返すモジュール。
+inputs: []
+outputs:
+  - name: documents
+    type: List[str]
+dependencies:
+  - fitz # PyMuPDF
+author: "Auto-Generated"
+license: "MIT"
+version: "1.0.0"

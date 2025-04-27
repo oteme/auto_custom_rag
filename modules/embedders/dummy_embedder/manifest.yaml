@@ -1,0 +1,14 @@
+# modules/embedders/dummy_embedder.yaml
+name: dummy_embedder
+type: embedder
+description: チャンク文字列を受け取り、ダミーのベクトル表現（文字列）を生成して返すモジュール。
+inputs:
+  - name: chunk
+    type: str
+outputs:
+  - name: vector
+    type: str
+dependencies: []
+author: "Auto-Generated"
+license: "MIT"
+version: "1.0.0"

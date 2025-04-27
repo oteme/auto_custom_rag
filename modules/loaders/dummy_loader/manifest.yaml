@@ -1,0 +1,12 @@
+# modules/loaders/dummy_loader.yaml
+name: dummy_loader
+type: loader
+description: 固定のダミーテキストドキュメントリスト（文字列）をロードして返すモジュール。初期化時のパス引数は使用されない。
+inputs: []
+outputs:
+  - name: documents
+    type: List[str]
+dependencies: []
+author: "Auto-Generated"
+license: "MIT"
+version: "1.0.0"

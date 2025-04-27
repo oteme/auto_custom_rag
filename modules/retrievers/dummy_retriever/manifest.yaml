@@ -1,0 +1,14 @@
+# modules/retrievers/dummy_retriever.yaml
+name: dummy_retriever
+type: retriever
+description: クエリ文字列を受け取り、クエリ内容に関わらず固定のダミーチャンク文字列リストを検索結果として返すモジュール。
+inputs:
+  - name: query
+    type: str
+outputs:
+  - name: retrieved_chunks
+    type: List[str]
+dependencies: []
+author: "Auto-Generated"
+license: "MIT"
+version: "1.0.0"

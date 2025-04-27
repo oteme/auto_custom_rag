@@ -1,0 +1,16 @@
+# modules/models/openai_model.yaml
+name: openai_model
+type: model
+description: OpenAI API（GPTモデル）またはAzure OpenAI APIを利用して、与えられたプロンプトに対するテキスト応答を生成するモジュール。APIキー等は環境変数から読み込む。Azure利用はオプションで指定可能。
+inputs:
+  - name: prompt
+    type: str
+outputs:
+  - name: response
+    type: str
+dependencies:
+  - openai
+  - python-dotenv
+author: "Auto-Generated"
+license: "MIT"
+version: "1.0.0"
