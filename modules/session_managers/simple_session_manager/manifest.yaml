@@ -1,0 +1,15 @@
+name: simple_session_manager
+type: session_manager
+description: 会話履歴をリスト形式で管理するシンプルなセッションマネージャー。
+inputs:
+  - name: role # add_messageメソッドの入力
+    type: str
+  - name: content # add_messageメソッドの入力
+    type: str
+outputs:
+  - name: history # get_contextメソッドの出力
+    type: List[dict]
+dependencies: []
+author: "Auto-Generated"
+license: "MIT"
+version: "1.0.0"

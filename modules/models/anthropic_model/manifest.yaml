@@ -1,16 +1,13 @@
-# modules/models/anthropic_model.yaml
 name: anthropic_model
 type: model
-description: Anthropic API（Claudeモデル）を利用して、与えられたプロンプトに対するテキスト応答を生成するモジュール。APIキーは環境変数 ANTHROPIC_API_KEY から読み込む。
+description: Anthropic API (Claudeモデル) を使用してテキスト生成を行うモジュール。
 inputs:
   - name: prompt
     type: str
 outputs:
   - name: response
     type: str
-dependencies:
-  - anthropic
-  - python-dotenv
+dependencies: [anthropic, python-dotenv]
 author: "Auto-Generated"
 license: "MIT"
 version: "1.0.0"

@@ -1,129 +1,159 @@
 # manager.py
+# ------------------------------------------------------------------
+#  auto-custom-rag – PipelineManager 〈完成版〉
+# ------------------------------------------------------------------
 
 from registry import ModuleRegistry
+
 
 class PipelineManager:
     def __init__(self, config: dict):
         self.config = config
+
+        # --- 各モジュール初期化用 ---
         self.loaders = []
         self.parser = None
         self.normalizer = None
         self.chunker = None
         self.embedder = None
+
         self.retriever = None
         self.filters = []
         self.reranker = None
+
         self.prompt_template = None
         self.postprocessors = []
+
+        self.session_manager = None
         self.model = None
+        self.mode_runner = None
 
+    # --------------------------------------------------------------
+    # パイプライン初期化（モジュールロード）
+    # --------------------------------------------------------------
     def initialize_pipeline(self):
-        self.check_pipeline_compatibility()
-        # Data Pipeline
-        data_cfg = self.config["data_pipeline"]
+        # --- Data Pipeline ---
+        dp = self.config.get("data_pipeline", {})
 
-        for loader_name in data_cfg["loaders"]:
-            LoaderClass = ModuleRegistry.get_class(loader_name)
-            loader_params = data_cfg.get("loader_params", {}).get(loader_name, {})
-            loader_instance = LoaderClass(**loader_params)
-            self.loaders.append(loader_instance)
+        for loader_conf in dp.get("loaders", []):
+            Loader = ModuleRegistry.get_class(loader_conf["name"])
+            self.loaders.append(Loader(**loader_conf.get("params", {})))
 
-        ParserClass = ModuleRegistry.get_class(data_cfg["parser"])
-        parser_params = data_cfg.get("parser_params", {}).get(data_cfg["parser"], {})
-        self.parser = ParserClass(**parser_params)
+        if dp.get("parser"):
+            Parser = ModuleRegistry.get_class(dp["parser"]["name"])
+            self.parser = Parser(**dp["parser"].get("params", {}))
 
-        NormalizerClass = ModuleRegistry.get_class(data_cfg["normalizer"])
-        normalizer_params = data_cfg.get("normalizer_params", {}).get(data_cfg["normalizer"], {})
-        self.normalizer = NormalizerClass(**normalizer_params)
+        if dp.get("normalizer"):
+            Normalizer = ModuleRegistry.get_class(dp["normalizer"]["name"])
+            self.normalizer = Normalizer(**dp["normalizer"].get("params", {}))
 
-        ChunkerClass = ModuleRegistry.get_class(data_cfg["chunker"])
-        chunker_params = data_cfg.get("chunker_params", {}).get(data_cfg["chunker"], {})
-        self.chunker = ChunkerClass(**chunker_params)
+        if dp.get("chunker"):
+            Chunker = ModuleRegistry.get_class(dp["chunker"]["name"])
+            self.chunker = Chunker(**dp["chunker"].get("params", {}))
 
-        EmbedderClass = ModuleRegistry.get_class(data_cfg["embedder"])
-        embedder_params = data_cfg.get("embedder_params", {}).get(data_cfg["embedder"], {})
-        self.embedder = EmbedderClass(**embedder_params)
+        if dp.get("embedder"):
+            Embedder = ModuleRegistry.get_class(dp["embedder"]["name"])
+            self.embedder = Embedder(**dp["embedder"].get("params", {}))
 
-        # Retrieval Pipeline
-        retrieval_cfg = self.config["retrieval_pipeline"]
+        # --- Retrieval Pipeline ---
+        retrieval_steps = self.config.get("retrieval_pipeline", {}).get("steps", [])
 
-        RetrieverClass = ModuleRegistry.get_class(retrieval_cfg["retriever"])
-        retriever_params = retrieval_cfg.get("retriever_params", {})
-        self.retriever = RetrieverClass(**retriever_params)
+        for step in retrieval_steps:
+            step_type = step["type"]
+            step_name = step["name"]
+            params = step.get("params", {})
 
-        for filter_name in retrieval_cfg["filters"]:
-            FilterClass = ModuleRegistry.get_class(filter_name)
-            filter_params = retrieval_cfg.get("filter_params", {}).get(filter_name, {})
-            filter_instance = FilterClass(**filter_params)
-            self.filters.append(filter_instance)
+            if step_type == "retriever":
+                RetrieverClass = ModuleRegistry.get_class(step_name)
+                self.retriever = RetrieverClass(**params)
 
-        RerankerClass = ModuleRegistry.get_class(retrieval_cfg["reranker"])
-        reranker_params = retrieval_cfg.get("reranker_params", {}).get(retrieval_cfg["reranker"], {})
-        self.reranker = RerankerClass(**reranker_params)
+            elif step_type == "filter":
+                FilterClass = ModuleRegistry.get_class(step_name)
+                filter_instance = FilterClass(**params)
+                self.filters.append(filter_instance)
 
-        # Generation Pipeline
-        generation_cfg = self.config["generation_pipeline"]
+            elif step_type == "reranker":
+                RerankerClass = ModuleRegistry.get_class(step_name)
+                self.reranker = RerankerClass(**params)
 
-        PromptTemplateClass = ModuleRegistry.get_class(generation_cfg["prompt_template"])
-        prompt_params = generation_cfg.get("prompt_template_params", {}).get(generation_cfg["prompt_template"], {})
-        self.prompt_template = PromptTemplateClass(**prompt_params)
+            else:
+                raise ValueError(f"Unknown retrieval step type: {step_type}")
 
-        for postprocessor_name in generation_cfg["postprocessors"]:
-            PostProcessorClass = ModuleRegistry.get_class(postprocessor_name)
-            postprocessor_params = generation_cfg.get("postprocessor_params", {}).get(postprocessor_name, {})
-            postprocessor_instance = PostProcessorClass(**postprocessor_params)
-            self.postprocessors.append(postprocessor_instance)
+        # --- Generation Pipeline ---
+        gp = self.config.get("generation_pipeline", {})
 
-        # Model (optional)
-        model_cfg = self.config.get("model")
-        if model_cfg:
-            ModelClass = ModuleRegistry.get_class(model_cfg["name"])
-            model_params = model_cfg.get("params", {})
-            self.model = ModelClass(**model_params)
+        if gp.get("prompt_template"):
+            PT = ModuleRegistry.get_class(gp["prompt_template"]["name"])
+            self.prompt_template = PT(**gp["prompt_template"].get("params", {}))
 
-    def ingest(self):
+        for postprocessor_conf in gp.get("postprocessors", []):
+            PP = ModuleRegistry.get_class(postprocessor_conf["name"])
+            self.postprocessors.append(PP(**postprocessor_conf.get("params", {})))
+
+        # --- Runtime Pipeline ---
+        rt = self.config.get("runtime_pipeline", {})
+
+        if rt.get("session_manager"):
+            SM = ModuleRegistry.get_class(rt["session_manager"]["name"])
+            self.session_manager = SM(**rt["session_manager"].get("params", {}))
+
+        if rt.get("model"):
+            Model = ModuleRegistry.get_class(rt["model"]["name"])
+            self.model = Model(**rt["model"].get("params", {}))
+
+        if rt.get("mode"):
+            Mode = ModuleRegistry.get_class(rt["mode"]["name"])
+            self.mode_runner = Mode(manager=self, **rt["mode"].get("params", {}))
+
+    # --------------------------------------------------------------
+    # フローに従ってパイプラインを順次実行
+    # --------------------------------------------------------------
+    def run(self):
+        for step in self.config.get("flow", []):
+            if step == "data_pipeline":
+                self._run_data_pipeline()
+            elif step == "retrieval_pipeline":
+                pass  # retrievalは通常runtimeで内部的に使う
+            elif step == "generation_pipeline":
+                pass  # generationも通常runtimeで内部的に使う
+            elif step == "runtime_pipeline":
+                if not self.mode_runner:
+                    raise ValueError("ModeRunner not initialized")
+                self.mode_runner.run()
+            else:
+                raise ValueError(f"[Manager] Unknown flow step: {step}")
+
+    # --------------------------------------------------------------
+    # データ取り込みパイプラインのみ個別実行
+    # --------------------------------------------------------------
+    def _run_data_pipeline(self):
         all_chunks = []
         for loader in self.loaders:
-            for raw_doc in loader.load():
-                parsed_doc = self.parser.parse(raw_doc)
-                normalized_doc = self.normalizer.normalize(parsed_doc)
-                chunks = self.chunker.chunk(normalized_doc)
+            raw_docs = loader.load()
+            for raw_doc in raw_docs:
+                parsed = self.parser.parse(raw_doc)
+                normalized = self.normalizer.normalize(parsed)
+                chunks = self.chunker.chunk(normalized)
                 all_chunks.extend(chunks)
 
         if hasattr(self.retriever, "ingest"):
             self.retriever.ingest(all_chunks, self.embedder)
 
-    def query(self, user_query: str):
-        retrieved_chunks = self.retriever.retrieve(user_query)
-
-        filtered_chunks = retrieved_chunks
-        for filter_module in self.filters:
-            filtered_chunks = filter_module.filter(filtered_chunks, user_query)
-
-        reranked_chunks = self.reranker.rerank(filtered_chunks, user_query)
-        prompt = self.prompt_template.format_prompt(user_query, reranked_chunks)
-
-        llm_response = self.model.generate(prompt) if self.model else f"Dummy response for prompt: {prompt[:30]}..."
-
-        final_response = llm_response
-        for postprocessor in self.postprocessors:
-            final_response = postprocessor.postprocess(final_response)
-
-        print("Final Response:")
-        print(final_response)
-
+    # --------------------------------------------------------------
+    # パイプライン互換性チェック
+    # --------------------------------------------------------------
     def check_pipeline_compatibility(self):
         print("[Manager] Checking pipeline compatibility...")
 
-        data_cfg = self.config["data_pipeline"]
+        data_cfg = self.config.get("data_pipeline")
         module_sequence = []
 
-        for loader_name in data_cfg["loaders"]:
-            module_sequence.append(loader_name)
-        module_sequence.append(data_cfg["parser"])
-        module_sequence.append(data_cfg["normalizer"])
-        module_sequence.append(data_cfg["chunker"])
-        module_sequence.append(data_cfg["embedder"])
+        for loader_conf in data_cfg.get("loaders", []):
+            module_sequence.append(loader_conf["name"])
+        module_sequence.append(data_cfg["parser"]["name"])
+        module_sequence.append(data_cfg["normalizer"]["name"])
+        module_sequence.append(data_cfg["chunker"]["name"])
+        module_sequence.append(data_cfg["embedder"]["name"])
 
         previous_outputs = None
         previous_module = None
@@ -144,3 +174,27 @@ class PipelineManager:
 
             previous_outputs = outputs
             previous_module = module_name
+
+    def retrieve_chunks(self, query: str):
+        """retrieval_pipeline.stepsに基づき柔軟にchunk retrievalを行う"""
+        chunks = None
+        steps = self.config["retrieval_pipeline"]["steps"]
+
+        for step in steps:
+            module_type = step["type"]
+
+            if module_type == "retriever":
+                chunks = self.retriever.retrieve(query)
+
+            elif module_type == "filter":
+                for filter_module in self.filters:
+                    chunks = filter_module.filter(chunks, query)
+
+            elif module_type == "reranker":
+                chunks = self.reranker.rerank(chunks, query)
+
+            else:
+                raise ValueError(f"Unknown retrieval step type: {module_type}")
+
+        return chunks
+

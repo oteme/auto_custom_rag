@@ -25,7 +25,8 @@ class ModuleRegistry:
     def _dynamic_import(cls, name):
         for category in [
             "loaders", "parsers", "normalizers", "chunkers", "embedders",
-            "retrievers", "filters", "rerankers", "prompts", "postprocessors", "models"
+            "retrievers", "filters", "rerankers", "prompts", "postprocessors",
+            "models", "session_managers", "modes"  # ←★ ここ追加！！！
         ]:
             try:
                 # ←★ ここ注意
@@ -41,8 +42,10 @@ class ModuleRegistry:
         """指定したモジュール名に対応するmanifest.yamlを辞書で返す"""
         for category in [
             "loaders", "parsers", "normalizers", "chunkers", "embedders",
-            "retrievers", "filters", "rerankers", "prompts", "postprocessors", "models"
+            "retrievers", "filters", "rerankers", "prompts", "postprocessors",
+            "models", "session_managers", "modes"
         ]:
+
             manifest_path = os.path.join("modules", category, name, "manifest.yaml")
             if os.path.exists(manifest_path):
                 with open(manifest_path, "r", encoding="utf-8") as f:

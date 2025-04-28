@@ -1,0 +1,9 @@
+name: query_mode
+type: mode
+description: ユーザーからの単一クエリを受け付け、Retrieval-Augmented Generation (RAG) を実行して応答を生成するモード。
+inputs: [] # runメソッドは内部でinput()を使用
+outputs: [] # runメソッドは内部でprint()を使用
+dependencies: []
+author: "Auto-Generated"
+license: "MIT"
+version: "1.0.0"
