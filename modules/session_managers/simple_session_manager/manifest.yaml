@@ -1,6 +1,7 @@
+# /modules/session_managers/simple_session_manager/__init__.py
 name: simple_session_manager
 type: session_manager
-description: 会話履歴をリスト形式で管理するシンプルなセッションマネージャー。
+description: 会話履歴（ユーザーとアシスタントの発言）をリスト形式で管理するシンプルなセッションマネージャー。履歴の追加、取得、リセット機能を持つ。
 inputs:
   - name: role # add_messageメソッドの入力
     type: str
@@ -8,7 +9,11 @@ inputs:
     type: str
 outputs:
   - name: history # get_contextメソッドの出力
-    type: List[dict]
+    type: list[dict]
+params:
+  - name: params # __init__で受け取るkwargs
+    type: dict
+    default: {}
 dependencies: []
 author: "Auto-Generated"
 license: "MIT"

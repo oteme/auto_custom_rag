@@ -1,8 +1,20 @@
+# /modules/modes/chat_mode/__init__.py
 name: chat_mode
 type: mode
-description: ユーザーと対話形式でチャットを行い、各ターンでRetrieval-Augmented Generation (RAG) を実行して応答を生成するモード。会話履歴を保持する。
-inputs: [] # runメソッドは内部でinput()を使用
-outputs: [] # runメソッドは内部でprint()を使用
+description: 対話形式でユーザーからの入力を受け付け、関連情報を検索し、モデルに応答を生成させ、結果を表示する実行モード。会話履歴を保持する。
+inputs: # runメソッド内での標準入力
+  - name: user_query
+    type: str
+outputs: # runメソッド内での標準出力
+  - name: response
+    type: str
+params:
+  - name: manager # 必須だが型は実行時依存
+    type: object
+    default: null
+  - name: kwargs # その他のパラメータ用
+    type: dict
+    default: {}
 dependencies: []
 author: "Auto-Generated"
 license: "MIT"

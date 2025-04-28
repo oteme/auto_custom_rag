@@ -1,15 +1,16 @@
-# modules/rerankers/simple_reranker.yaml
+# /modules/rerankers/simple_reranker/__init__.py
 name: simple_reranker
 type: reranker
-description: チャンクリスト（要素は文字列または辞書）とクエリ文字列を受け取り、チャンクのテキスト部分の文字数順にソートしてリランキングし、並び替えたチャンクリストを返すモジュール。
+description: チャンクリスト（文字列または辞書形式）とクエリを受け取り、チャンクのテキスト部分の文字数に基づいて昇順に並び替える（リランキングする）リランカー。
 inputs:
   - name: chunks
-    type: List[Union[str, dict]]
+    type: list[any] # list[str] or list[dict]
   - name: query
     type: str
 outputs:
   - name: reranked_chunks
-    type: List[Union[str, dict]]
+    type: list[any]
+params: []
 dependencies: []
 author: "Auto-Generated"
 license: "MIT"

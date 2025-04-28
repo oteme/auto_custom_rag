@@ -1,13 +1,29 @@
+# /modules/models/together_model/__init__.py
 name: together_model
 type: model
-description: Together AI API を使用してテキスト生成を行うモジュール。
+description: Together AI API を使用して、与えられたプロンプトに対する応答を生成するモデル。APIキーはパラメータまたは環境変数から取得。
 inputs:
   - name: prompt
     type: str
 outputs:
   - name: response
     type: str
-dependencies: [together, python-dotenv]
+params:
+  - name: model
+    type: str
+    default: "togethercomputer/llama-2-7b-chat"
+  - name: temperature
+    type: float
+    default: 0.7
+  - name: api_key # Together AI APIキー (kwargs経由)
+    type: str
+    default: null
+  - name: generation_kwargs # その他のAPIパラメータ用
+    type: dict
+    default: {}
+dependencies:
+  - python-dotenv
+  - together
 author: "Auto-Generated"
 license: "MIT"
 version: "1.0.0"

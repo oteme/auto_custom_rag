@@ -1,15 +1,16 @@
-# modules/rerankers/dummy_reranker.yaml
+# /modules/rerankers/dummy_reranker/__init__.py
 name: dummy_reranker
 type: reranker
-description: チャンク文字列リストとクエリ文字列を受け取り、ダミーのリランキング処理（チャンクの文字数順にソート）を行い、並び替えたチャンクリストを返すモジュール。
+description: チャンクリストとクエリを受け取り、チャンクの文字数に基づいて昇順に並び替える（リランキングする）ダミーのリランカー。
 inputs:
   - name: chunks
-    type: List[str]
+    type: list[str]
   - name: query
     type: str
 outputs:
   - name: reranked_chunks
-    type: List[str]
+    type: list[str]
+params: []
 dependencies: []
 author: "Auto-Generated"
 license: "MIT"

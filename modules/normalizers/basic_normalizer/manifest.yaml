@@ -1,13 +1,14 @@
-# modules/normalizers/basic_normalizer.yaml
+# /modules/normalizers/basic_normalizer/__init__.py
 name: basic_normalizer
 type: normalizer
-description: パースされたドキュメント文字列を受け取り、ダミーの正規化処理（文字列加工）を行い、正規化された文字列を返すモジュール。
+description: パースされたドキュメントを受け取り、単純に固定の文字列を追加して正規化するノーマライザー。
 inputs:
   - name: parsed_doc
     type: str
 outputs:
   - name: normalized_doc
     type: str
+params: []
 dependencies: []
 author: "Auto-Generated"
 license: "MIT"

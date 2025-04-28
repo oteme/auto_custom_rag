@@ -1,13 +1,29 @@
-# modules/retrievers/faiss_retriever.yaml
+# /modules/retrievers/faiss_retriever/__init__.py
 name: faiss_retriever
 type: retriever
-description: FAISSライブラリを使用してベクトル検索を行うRetrieverモジュール。ingestメソッドでチャンク（テキストとメタデータ辞書）をEmbedderを用いてベクトル化し、FAISSインデックスを構築・保存する。retrieveメソッドでクエリ文字列（内部でベクトル化）に類似した上位K件のチャンク（メタデータ付き辞書のリスト）を検索して返す。インデックスの永続化（保存/ロード）機能も持つ。
+description: FAISSライブラリを使用してベクトル検索を行うリトリーバー。チャンクとベクトルをインデックス化し、クエリベクトルに最も近いチャンク（メタ情報付き）を検索する。インデックスの永続化（保存/ロード）機能を持つ。
 inputs:
   - name: query # retrieveメソッドの入力
     type: str
+  - name: chunks # ingestメソッドの入力
+    type: list[any]
+  - name: embedder # ingestメソッドの入力
+    type: object
+  - name: path_prefix # save/loadメソッドの入力
+    type: str
 outputs:
   - name: retrieved_chunks # retrieveメソッドの出力
-    type: List[dict] # {"text": str, "metadata": dict} のリスト
+    type: list[dict]
+params:
+  - name: embedding_dim
+    type: int
+    default: 128
+  - name: top_k
+    type: int
+    default: 3
+  - name: index_path # インデックスファイルのプレフィックス
+    type: str
+    default: null
 dependencies:
   - faiss-cpu
   - numpy

@@ -1,11 +1,15 @@
-# modules/loaders/pdf_loader.yaml
+# /modules/loaders/pdf_loader/__init__.py
 name: pdf_loader
 type: loader
-description: 指定されたディレクトリパスからPDFファイルを読み込み、各PDFから抽出したテキストコンテンツのリスト（文字列）を返すモジュール。
-inputs: []
+description: 指定されたディレクトリパス内の全てのPDFファイルからテキストを抽出し、ドキュメント（文字列リスト）としてロードするローダー。PyMuPDF(fitz)を使用。
+inputs: [] # loadメソッドに引数なし
 outputs:
   - name: documents
-    type: List[str]
+    type: list[str]
+params:
+  - name: path
+    type: str
+    default: "data/pdfs/"
 dependencies:
   - fitz # PyMuPDF
 author: "Auto-Generated"

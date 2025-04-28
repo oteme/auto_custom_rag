@@ -1,13 +1,20 @@
-# modules/embedders/simple_embedder.yaml
+# /modules/embedders/simple_embedder/__init__.py
 name: simple_embedder
 type: embedder
-description: チャンク文字列を受け取り、指定された次元数のランダムなベクトル（数値のリスト）を生成して返すモジュール。
+description: チャンクを受け取り、指定された次元数のランダムなベクトル（数値リスト）を生成するシンプルなエンベッダー。
 inputs:
   - name: chunk
     type: str
 outputs:
   - name: vector
-    type: List[float]
+    type: list[float]
+params:
+  - name: embedding_dim
+    type: int
+    default: 128
+  - name: seed
+    type: int
+    default: 42
 dependencies:
   - numpy
 author: "Auto-Generated"

@@ -1,15 +1,16 @@
-# modules/prompts/simple_prompt_template.yaml
+# /modules/prompts/simple_prompt_template/__init__.py
 name: simple_prompt_template
 type: prompt_template
-description: クエリ文字列とコンテキストチャンクのリスト（要素は文字列または辞書）を受け取り、それらを組み合わせてLLMへの入力プロンプト文字列を生成するモジュール。
+description: クエリとコンテキストチャンク（文字列または辞書形式）を受け取り、固定のテンプレートに基づいてモデルへの入力プロンプトを生成する。
 inputs:
   - name: query
     type: str
   - name: context_chunks
-    type: List[Union[str, dict]]
+    type: list[any] # list[str] or list[dict]
 outputs:
   - name: prompt
     type: str
+params: []
 dependencies: []
 author: "Auto-Generated"
 license: "MIT"

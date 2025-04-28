@@ -1,8 +1,20 @@
+# /modules/modes/query_mode/__init__.py
 name: query_mode
 type: mode
-description: ユーザーからの単一クエリを受け付け、Retrieval-Augmented Generation (RAG) を実行して応答を生成するモード。
-inputs: [] # runメソッドは内部でinput()を使用
-outputs: [] # runメソッドは内部でprint()を使用
+description: 一度だけユーザーからのクエリを受け付け、関連情報を検索し、モデルに応答を生成させ、最終結果を表示する実行モード。
+inputs: # runメソッド内での標準入力
+  - name: user_query
+    type: str
+outputs: # runメソッド内での標準出力
+  - name: response
+    type: str
+params:
+  - name: manager # 必須だが型は実行時依存
+    type: object
+    default: null
+  - name: kwargs # その他のパラメータ用
+    type: dict
+    default: {}
 dependencies: []
 author: "Auto-Generated"
 license: "MIT"

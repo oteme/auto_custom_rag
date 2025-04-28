@@ -1,13 +1,14 @@
-# modules/chunkers/simple_chunker.yaml
+# /modules/chunkers/simple_chunker/__init__.py
 name: simple_chunker
 type: chunker
-description: 正規化されたドキュメント文字列を受け取り、ダミーで2つのチャンク文字列リストに分割するモジュール。
+description: 正規化されたドキュメントを受け取り、単純に固定の文字列を追加して2つのチャンクに分割するチャンカー。
 inputs:
   - name: normalized_doc
     type: str
 outputs:
   - name: chunks
-    type: List[str]
+    type: list[str]
+params: []
 dependencies: []
 author: "Auto-Generated"
 license: "MIT"

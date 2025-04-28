@@ -1,13 +1,29 @@
+# /modules/models/local_hf_model/__init__.py
 name: local_hf_model
 type: model
-description: ローカルまたはHuggingFace Hub上のモデルを使用してテキスト生成を行うモジュール。
+description: ローカルまたはHugging Face Hub上のモデルを Transformers ライブラリを使用してロードし、プロンプトに対する応答を生成するモデル。デバイス（CPU/GPU）は自動選択または指定可能。
 inputs:
   - name: prompt
     type: str
 outputs:
   - name: response
     type: str
-dependencies: [transformers, torch]
+params:
+  - name: model_path
+    type: str
+    default: "gpt2"
+  - name: device
+    type: str
+    default: null # Noneの場合は自動選択
+  - name: temperature
+    type: float
+    default: 0.7
+  - name: generation_kwargs # その他の生成パラメータ用
+    type: dict
+    default: {}
+dependencies:
+  - transformers
+  - torch
 author: "Auto-Generated"
 license: "MIT"
 version: "1.0.0"

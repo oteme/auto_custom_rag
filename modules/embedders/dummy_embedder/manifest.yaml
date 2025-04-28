@@ -1,13 +1,14 @@
-# modules/embedders/dummy_embedder.yaml
+# /modules/embedders/dummy_embedder/__init__.py
 name: dummy_embedder
 type: embedder
-description: チャンク文字列を受け取り、ダミーのベクトル表現（文字列）を生成して返すモジュール。
+description: チャンクを受け取り、ダミーのベクトル表現（文字列）を生成するエンベッダー。実際の埋め込みは行わない。
 inputs:
   - name: chunk
     type: str
 outputs:
   - name: vector
     type: str
+params: []
 dependencies: []
 author: "Auto-Generated"
 license: "MIT"

@@ -1,13 +1,14 @@
-# modules/parsers/simple_parser.yaml
+# /modules/parsers/simple_parser/__init__.py
 name: simple_parser
 type: parser
-description: 生のドキュメント文字列を受け取り、ダミーのパース処理（文字列加工）を行い、パースされた文字列を返すモジュール。
+description: 生のドキュメントを受け取り、単純に固定の文字列を追加してパースするパーサー。
 inputs:
   - name: raw_doc
     type: str
 outputs:
   - name: parsed_doc
     type: str
+params: []
 dependencies: []
 author: "Auto-Generated"
 license: "MIT"

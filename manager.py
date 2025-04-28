@@ -32,6 +32,7 @@ class PipelineManager:
     # パイプライン初期化（モジュールロード）
     # --------------------------------------------------------------
     def initialize_pipeline(self):
+        self.check_pipeline_compatibility()
         # --- Data Pipeline ---
         dp = self.config.get("data_pipeline", {})
 

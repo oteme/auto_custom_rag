@@ -1,13 +1,14 @@
-# modules/postprocessors/simple_postprocessor.yaml
+# /modules/postprocessors/simple_postprocessor/__init__.py
 name: simple_postprocessor
 type: postprocessor
-description: モデルからの応答文字列を受け取り、簡単な後処理（先頭に"【回答】\n"を追加）を行って返すモジュール。
+description: モデルからの応答を受け取り、先頭に "【回答】" を追加して後処理を行うポストプロセッサー。
 inputs:
   - name: response
     type: str
 outputs:
   - name: processed_response
     type: str
+params: []
 dependencies: []
 author: "Auto-Generated"
 license: "MIT"
