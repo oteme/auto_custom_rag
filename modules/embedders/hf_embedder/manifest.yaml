@@ -1,0 +1,22 @@
+# /modules/embedders/hf_embedder/__init__.py
+name: hf_embedder
+type: embedder
+description: Hugging FaceのSentence Transformersライブラリを使用して、指定されたモデルでテキストをベクトル（埋め込み）に変換するエンベッダー。デバイス（CPU/GPU）の指定も可能。
+inputs:
+  - name: text
+    type: str
+outputs:
+  - name: embedding
+    type: list[float]
+params:
+  - name: model_name
+    type: str
+    default: "all-MiniLM-L6-v2"
+  - name: device
+    type: str
+    default: null
+dependencies:
+  - sentence-transformers
+author: "Auto-Generated"
+license: "MIT"
+version: "1.0.0"

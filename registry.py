@@ -26,7 +26,7 @@ class ModuleRegistry:
         for category in [
             "loaders", "parsers", "normalizers", "chunkers", "embedders",
             "retrievers", "filters", "rerankers", "prompts", "postprocessors",
-            "models", "session_managers", "modes"  # ←★ ここ追加！！！
+            "models", "session_managers", "modes", "retrieval_mergers"  # ←★ ここ追加！！！
         ]:
             try:
                 # ←★ ここ注意
@@ -43,7 +43,7 @@ class ModuleRegistry:
         for category in [
             "loaders", "parsers", "normalizers", "chunkers", "embedders",
             "retrievers", "filters", "rerankers", "prompts", "postprocessors",
-            "models", "session_managers", "modes"
+            "models", "session_managers", "modes","retrieval_mergers"
         ]:
 
             manifest_path = os.path.join("modules", category, name, "manifest.yaml")

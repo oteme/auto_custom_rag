@@ -41,7 +41,7 @@ class FAISSRetriever:
 
             vector = embedder.embed(text)
             vectors.append(vector)
-            self.chunk_data.append({"text": text, "metadata": metadata})
+            self.chunk_data.append({"text": text, "metadata": metadata})  # ★ここ！保存形式を統一
 
         vectors = np.array(vectors).astype(np.float32)
         self.index.add(vectors)
@@ -51,19 +51,28 @@ class FAISSRetriever:
         if self.index_path:
             self.save(self.index_path)
 
-    def retrieve(self, query):
-        """クエリを埋め込み→最も近いチャンク(＋メタ情報付き)を返す"""
+    def retrieve(self, query_vector, top_k=None, with_scores=False):
+        """ベクトルから最近傍チャンクを取得"""
         if self.index.ntotal == 0:
             return []
 
-        query_vector = np.random.rand(self.embedding_dim).astype(np.float32)  # 仮：ランダム
-        D, I = self.index.search(query_vector.reshape(1, -1), self.top_k)
+        k = top_k if top_k is not None else self.top_k
+        D, I = self.index.search(np.array(query_vector, dtype=np.float32).reshape(1, -1), k)
 
         retrieved = []
-        for idx in I[0]:
+        for idx, dist in zip(I[0], D[0]):
             if idx < len(self.chunk_data):
-                retrieved.append(self.chunk_data[idx])
+                chunk = self.chunk_data[idx]
+                if with_scores:
+                    score = 1.0 / (1.0 + dist)
+                    retrieved.append((chunk, score))
+                else:
+                    retrieved.append(chunk)
+
         return retrieved
+
+
+
 
     def save(self, path_prefix: str):
         """FAISSインデックスとチャンクデータを保存する"""

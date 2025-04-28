@@ -66,7 +66,10 @@ class PipelineManager:
 
             if step_type == "retriever":
                 RetrieverClass = ModuleRegistry.get_class(step_name)
-                self.retriever = RetrieverClass(**params)
+
+                retriever_params = {k: v for k, v in params.items() if k != "embedding_required"}
+
+                self.retriever = RetrieverClass(**retriever_params)
 
             elif step_type == "filter":
                 FilterClass = ModuleRegistry.get_class(step_name)
@@ -77,6 +80,15 @@ class PipelineManager:
                 RerankerClass = ModuleRegistry.get_class(step_name)
                 self.reranker = RerankerClass(**params)
 
+
+            elif step_type == "embedder":  # ←✨これ追加する！
+                EmbedderClass = ModuleRegistry.get_class(step_name)
+                self.retrieval_query_embedder = EmbedderClass(**params)
+
+            elif step_type == "retrieval_merge":  # ✨これ追加！
+                MergeClass = ModuleRegistry.get_class(step_name)
+                self.retrieval_merger = MergeClass(**params)
+                
             else:
                 raise ValueError(f"Unknown retrieval step type: {step_type}")
 
@@ -137,8 +149,23 @@ class PipelineManager:
                 chunks = self.chunker.chunk(normalized)
                 all_chunks.extend(chunks)
 
-        if hasattr(self.retriever, "ingest"):
-            self.retriever.ingest(all_chunks, self.embedder)
+        steps = self.config.get("retrieval_pipeline", {}).get("steps", [])
+        self.retrievers = {}  # retrieversを保存する辞書（追加）
+
+        for step in steps:
+            if step["type"] == "retriever":
+                RetrieverClass = ModuleRegistry.get_class(step["name"])
+                params = step.get("params", {})
+                retriever_params = {k: v for k, v in params.items() if k != "embedding_required"}
+
+                retriever_instance = RetrieverClass(**retriever_params)
+
+                if hasattr(retriever_instance, "ingest"):
+                    retriever_instance.ingest(all_chunks, self.embedder)
+
+                # retriever名で保存しておく！
+                self.retrievers[step["name"]] = retriever_instance
+
 
     # --------------------------------------------------------------
     # パイプライン互換性チェック
@@ -177,25 +204,58 @@ class PipelineManager:
             previous_module = module_name
 
     def retrieve_chunks(self, query: str):
-        """retrieval_pipeline.stepsに基づき柔軟にchunk retrievalを行う"""
-        chunks = None
+        """retrieval_pipeline.stepsに基づき柔軟にretrievalを実行する"""
+        data = query  # 最初は生のクエリ文字列
         steps = self.config["retrieval_pipeline"]["steps"]
+        retrieval_buffer = []  # retrieverたちの出力一時バッファ
 
         for step in steps:
             module_type = step["type"]
 
-            if module_type == "retriever":
-                chunks = self.retriever.retrieve(query)
+            if module_type == "embedder":
+                if not hasattr(self, "retrieval_query_embedder"):
+                    EmbedderClass = ModuleRegistry.get_class(step["name"])
+                    self.retrieval_query_embedder = EmbedderClass(**step.get("params", {}))
+                data = self.retrieval_query_embedder.embed(data)  # data = query_vector
+
+            elif module_type == "retriever":
+                RetrieverClass = ModuleRegistry.get_class(step["name"])
+                params = step.get("params", {})
+                retriever_params = {k: v for k, v in params.items() if k != "embedding_required"}
+
+                retriever_instance = RetrieverClass(**retriever_params)
+
+                # ✨ ここでembeddingが必要か判定する
+                embedding_required = step.get("params", {}).get("embedding_required", False)
+                query_input = (
+                    self.retrieval_query_embedder.embed(data)
+                    if embedding_required
+                    else data
+                )
+
+                chunks = retriever_instance.retrieve(query_input)
+                retrieval_buffer.extend(chunks)
+
+            elif module_type == "retrieval_merge":
+                MergeClass = ModuleRegistry.get_class(step["name"])
+                merger = MergeClass(**step.get("params", {}))
+                retrieval_buffer = merger.merge(retrieval_buffer)
 
             elif module_type == "filter":
-                for filter_module in self.filters:
-                    chunks = filter_module.filter(chunks, query)
+                FilterClass = ModuleRegistry.get_class(step["name"])
+                filter_instance = FilterClass(**step.get("params", {}))
+                retrieval_buffer = filter_instance.filter(retrieval_buffer, query)
 
             elif module_type == "reranker":
-                chunks = self.reranker.rerank(chunks, query)
+                RerankerClass = ModuleRegistry.get_class(step["name"])
+                reranker_instance = RerankerClass(**step.get("params", {}))
+                retrieval_buffer = reranker_instance.rerank(retrieval_buffer, query)
 
             else:
                 raise ValueError(f"Unknown retrieval step type: {module_type}")
 
-        return chunks
+        return retrieval_buffer
+
+
+
 

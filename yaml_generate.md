@@ -33,6 +33,7 @@ version: "1.0.0"
 - **inputs / outputs** は主な公開メソッドから推測してください。
 - **params** は `__init__(self, …)` の引数を列挙し、デフォルトが無ければ `null`。
 - import 文から外部ライブラリのみ dependencies に列挙してください。
+- retrieverに関してシステム側の問題でモジュールのコード内容にかかわらず共通で"embedding_required"を受け取る必要があります。(TrueかFalse)。なのでretrieverには必ずembedding_requiredのparamsをつけるようにしてください
 - 不明点があれば合理的に補完し、**manifest.yaml 本体のみ** を出力してください。
 
 ### 📥 入力データ
