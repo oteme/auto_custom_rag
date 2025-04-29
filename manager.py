@@ -2,7 +2,7 @@
 # ------------------------------------------------------------------
 #  auto-custom-rag – PipelineManager 〈完成版〉
 # ------------------------------------------------------------------
-
+from flow_controller import FlowController
 from registry import ModuleRegistry
 
 
@@ -27,6 +27,8 @@ class PipelineManager:
         self.session_manager = None
         self.model = None
         self.mode_runner = None
+
+        self.flow_controller = FlowController() 
 
     # --------------------------------------------------------------
     # パイプライン初期化（モジュールロード）
@@ -59,17 +61,23 @@ class PipelineManager:
         # --- Retrieval Pipeline ---
         retrieval_steps = self.config.get("retrieval_pipeline", {}).get("steps", [])
 
+        self.flow_controller.add_flow(
+            "default",  # とりあえずデフォルト名
+            {"steps": retrieval_steps}  # 今までのretrieval_pipelineそのまま
+        )
+        self.flow_controller.set_current_flow("default")
+
+
         for step in retrieval_steps:
             step_type = step["type"]
             step_name = step["name"]
             params = step.get("params", {})
 
             if step_type == "retriever":
+                params = dict(step.get("params", {}))  # ここでdictコピーする
+                params.pop("embedding_required", None)  # embedding_requiredを取り除く
                 RetrieverClass = ModuleRegistry.get_class(step_name)
-
-                retriever_params = {k: v for k, v in params.items() if k != "embedding_required"}
-
-                self.retriever = RetrieverClass(**retriever_params)
+                self.retriever = RetrieverClass(**params)
 
             elif step_type == "filter":
                 FilterClass = ModuleRegistry.get_class(step_name)
@@ -154,17 +162,15 @@ class PipelineManager:
 
         for step in steps:
             if step["type"] == "retriever":
+                params = dict(step.get("params", {}))  # ここでdictコピーする
+                params.pop("embedding_required", None)  # embedding_requiredを取り除く
                 RetrieverClass = ModuleRegistry.get_class(step["name"])
-                params = step.get("params", {})
-                retriever_params = {k: v for k, v in params.items() if k != "embedding_required"}
-
-                retriever_instance = RetrieverClass(**retriever_params)
+                retriever_instance = RetrieverClass(**params)
 
                 if hasattr(retriever_instance, "ingest"):
                     retriever_instance.ingest(all_chunks, self.embedder)
 
-                # retriever名で保存しておく！
-                self.retrievers[step["name"]] = retriever_instance
+                self.retrievers[step["name"]] = retriever_instance  
 
 
     # --------------------------------------------------------------
@@ -205,9 +211,12 @@ class PipelineManager:
 
     def retrieve_chunks(self, query: str):
         """retrieval_pipeline.stepsに基づき柔軟にretrievalを実行する"""
-        data = query  # 最初は生のクエリ文字列
-        steps = self.config["retrieval_pipeline"]["steps"]
-        retrieval_buffer = []  # retrieverたちの出力一時バッファ
+        data = query
+        flow = self.flow_controller.get_current_flow()
+
+        steps = flow["steps"]
+
+        retrieval_buffer = []
 
         for step in steps:
             module_type = step["type"]
@@ -217,21 +226,26 @@ class PipelineManager:
                     EmbedderClass = ModuleRegistry.get_class(step["name"])
                     self.retrieval_query_embedder = EmbedderClass(**step.get("params", {}))
                 data = self.retrieval_query_embedder.embed(data)  # data = query_vector
+                # --- ✨ここ追加✨ ---
+                if isinstance(data, str):
+                    data = self.retrieval_query_embedder.embed(data)
+                else:
+                    # もうベクトルならそのまま
+                    pass
 
             elif module_type == "retriever":
+                params = dict(step.get("params", {}))  # ⭐ ここでちゃんとparamsを作る！
+                params.pop("embedding_required", None) 
                 RetrieverClass = ModuleRegistry.get_class(step["name"])
-                params = step.get("params", {})
-                retriever_params = {k: v for k, v in params.items() if k != "embedding_required"}
+                retriever_instance = RetrieverClass(**params)
 
-                retriever_instance = RetrieverClass(**retriever_params)
-
-                # ✨ ここでembeddingが必要か判定する
                 embedding_required = step.get("params", {}).get("embedding_required", False)
-                query_input = (
-                    self.retrieval_query_embedder.embed(data)
-                    if embedding_required
-                    else data
-                )
+
+                # 🚨 ここが重要
+                if embedding_required and isinstance(data, str):
+                    query_input = self.retrieval_query_embedder.embed(data)
+                else:
+                    query_input = data
 
                 chunks = retriever_instance.retrieve(query_input)
                 retrieval_buffer.extend(chunks)
