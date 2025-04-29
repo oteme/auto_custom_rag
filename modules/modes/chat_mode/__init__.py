@@ -1,41 +1,29 @@
-# modules/modes/chat_mode.py
-
+# modules/modes/chat_mode/__init__.py
+# ------------------------------------------------------------
+# ChatMode ＝ もはや Interaction だけ
+#  * 入力: stdin
+#  * 出力: stdout
+#  * 1 行入力ごとに DialogueController.handle を呼ぶ
+# ------------------------------------------------------------
 from registry import ModuleRegistry
 
+
 class ChatMode:
-    def __init__(self, manager, **kwargs):
-        self.manager = manager
-        self.history = []
+    def __init__(
+        self,
+        manager,
+        dialogue_controller: str = "simple_dialogue"  # ← config で差し替え可
+    ):
+        DC = ModuleRegistry.get_class(dialogue_controller)
+        # SessionManager は Manager が初期化済みのものを取り出す
+        sm = manager._module_cache["simple_session_manager"]
+        self.dialog = DC(manager, sm)
 
     def run(self):
-        print("💬 Chat Mode Activated! (type 'exit' to quit)")
-        
+        print("💬 Chat CLI (exit で終了)")
         while True:
-            user_query = input("🧑‍💻 You: ")
-            if user_query.strip().lower() == "exit":
-                print("👋 Goodbye!")
+            msg = input("🧑: ")
+            if msg.lower() in {"exit", "quit"}:
                 break
-
-            # Append user query to history
-            self.history.append({"role": "user", "content": user_query})
-
-            # Retrieval
-            retrieved_chunks = self.manager.retrieve_chunks(user_query)
-
-            # Prompt Generation (履歴込みで作るならカスタマイズ可能)
-            prompt = self.manager.prompt_template.format_prompt(user_query, retrieved_chunks)
-
-            # Model Inference
-            response = self.manager.model.generate(prompt)
-
-            # Append model response to history
-            self.history.append({"role": "assistant", "content": response})
-
-            # Postprocess
-            for postprocessor in self.manager.postprocessors:
-                response = postprocessor.postprocess(response)
-
-            print("\n🤖 Assistant:")
-            print(response)
-
-ModuleRegistry.register("chat_mode", ChatMode)
+            ans = self.dialog.handle(msg)
+            print("🤖:", ans)

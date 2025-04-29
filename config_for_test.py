@@ -32,7 +32,9 @@ config = {
         "session_manager": {"name": "simple_session_manager", "params": {}},
         "model": {"name": "openai_model", "params": {"model": "gpt-4o-mini",
         "temperature": 0.7}},
-        "mode": {"name": "chat_mode", "params": {}}
+        "mode": {"name": "chat_mode", "params": {}},
+        "dialogue_ctrl": {"name": "simple_dialogue", "params": {}},
+        "ui_adapter": {"name": "cli_adapter", "params": {}},
     },
     "flow": [
         "data_pipeline",

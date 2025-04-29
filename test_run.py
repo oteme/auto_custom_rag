@@ -1,15 +1,19 @@
-# test_run.py
-
 from manager import PipelineManager
+from registry import ModuleRegistry
 from config_for_test import config
 
 def main():
-    print("[test_run] パイプライン初期化開始...")
-    manager = PipelineManager(config)
-    manager.initialize_pipeline()
+    manager = PipelineManager(config)                 # ❶ エンジンを生成
 
-    print("[test_run] モード実行開始...")
-    manager.mode_runner.run()
+    # ❷ config からモード定義を取り出す
+    mode_conf  = config["runtime_pipeline"]["mode"]
+    ModeClass  = ModuleRegistry.get_class(mode_conf["name"])
+
+    # ❸ モードをインスタンス化（Manager を注入）
+    mode_runner = ModeClass(manager=manager, **mode_conf.get("params", {}))
+
+    # ❹ UI ループ開始
+    mode_runner.run()
 
 if __name__ == "__main__":
     main()
