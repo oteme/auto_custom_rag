@@ -1,7 +1,6 @@
-# /modules/normalizers/basic_normalizer/__init__.py
 name: basic_normalizer
 type: normalizer
-description: パースされたドキュメントを受け取り、単純に固定の文字列を追加して正規化するノーマライザー。
+description: 入力されたパース済みドキュメントに対して基本的な正規化（ダミー）を行うノーマライザー。
 inputs:
   - name: parsed_doc
     type: str

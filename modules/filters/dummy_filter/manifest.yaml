@@ -1,15 +1,14 @@
-# /modules/filters/dummy_filter/__init__.py
 name: dummy_filter
 type: filter
-description: チャンクリストとクエリを受け取り、クエリに "tree" が含まれる場合、チャンクテキスト（小文字）に "tree" が含まれるもののみをフィルタリングする。該当がない場合は元のリストを返すダミーフィルター。
+description: クエリに "tree" が含まれる場合、チャンクテキストに "tree" を含むもののみをフィルタリングするダミーフィルター。
 inputs:
   - name: chunks
-    type: list[str]
+    type: list
   - name: query
     type: str
 outputs:
   - name: filtered_chunks
-    type: list[str]
+    type: list
 params: []
 dependencies: []
 author: "Auto-Generated"

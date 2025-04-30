@@ -1,0 +1,14 @@
+name: unique_merge
+type: retrieval_merger
+description: 複数のRetrieverから得られたチャンクリストをマージし、重複するチャンク（テキスト内容で判断）を除去するマージャー。
+inputs:
+  - name: chunks_list
+    type: list
+outputs:
+  - name: unique_chunks
+    type: list
+params: []
+dependencies: []
+author: "Auto-Generated"
+license: "MIT"
+version: "1.0.0"

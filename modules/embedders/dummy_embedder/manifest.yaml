@@ -1,12 +1,11 @@
-# /modules/embedders/dummy_embedder/__init__.py
 name: dummy_embedder
 type: embedder
-description: チャンクを受け取り、ダミーのベクトル表現（文字列）を生成するエンベッダー。実際の埋め込みは行わない。
+description: 入力チャンクに対してダミーの埋め込み表現（文字列）を生成するエンベッダー。
 inputs:
   - name: chunk
     type: str
 outputs:
-  - name: vector
+  - name: embedding
     type: str
 params: []
 dependencies: []

@@ -1,0 +1,21 @@
+name: bm25_retriever
+type: retriever
+description: BM25アルゴリズムを使用して、テキストコーパスからクエリに関連するチャンクを検索するリトリーバー。
+inputs:
+  - name: query
+    type: str
+outputs:
+  - name: retrieved_chunks
+    type: list
+params:
+  - name: top_k
+    type: int
+    default: 3
+  - name: embedding_required
+    type: bool
+    default: False
+dependencies:
+  - rank_bm25
+author: "Auto-Generated"
+license: "MIT"
+version: "1.0.0"

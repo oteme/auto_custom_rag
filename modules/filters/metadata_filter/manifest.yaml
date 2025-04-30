@@ -1,0 +1,22 @@
+name: metadata_filter
+type: filter
+description: チャンクのメタデータに基づいてフィルタリングする。指定されたキーの値が許可リストに含まれるチャンクのみを残す。
+inputs:
+  - name: chunks
+    type: list[dict]
+  - name: query
+    type: str | None
+outputs:
+  - name: filtered_chunks
+    type: list[dict]
+params:
+  - name: key
+    type: str
+    default: null
+  - name: allowed_values
+    type: list
+    default: null
+dependencies: []
+author: "Auto-Generated"
+license: "MIT"
+version: "1.0.0"

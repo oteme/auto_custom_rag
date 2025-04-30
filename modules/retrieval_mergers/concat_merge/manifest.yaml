@@ -1,0 +1,14 @@
+name: concat_merge
+type: retrieval_merger
+description: 複数のRetrieverから得られたチャンクリストを単純に連結するマージャー。
+inputs:
+  - name: chunks_list
+    type: list[list]
+outputs:
+  - name: merged_chunks
+    type: list
+params: []
+dependencies: []
+author: "Auto-Generated"
+license: "MIT"
+version: "1.0.0"

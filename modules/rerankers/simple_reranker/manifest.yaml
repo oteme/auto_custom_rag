@@ -1,15 +1,14 @@
-# /modules/rerankers/simple_reranker/__init__.py
 name: simple_reranker
 type: reranker
-description: チャンクリスト（文字列または辞書形式）とクエリを受け取り、チャンクのテキスト部分の文字数に基づいて昇順に並び替える（リランキングする）リランカー。
+description: チャンクのテキスト部分の文字数順（昇順）に並び替えるシンプルなリランカー。
 inputs:
   - name: chunks
-    type: list[any] # list[str] or list[dict]
+    type: list
   - name: query
     type: str
 outputs:
   - name: reranked_chunks
-    type: list[any]
+    type: list
 params: []
 dependencies: []
 author: "Auto-Generated"

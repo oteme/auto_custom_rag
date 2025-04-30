@@ -1,7 +1,6 @@
-# /modules/postprocessors/simple_postprocessor/__init__.py
 name: simple_postprocessor
 type: postprocessor
-description: モデルからの応答を受け取り、先頭に "【回答】" を追加して後処理を行うポストプロセッサー。
+description: モデルの生成結果に対して簡単な後処理（接頭辞の追加）を行うポストプロセッサー。
 inputs:
   - name: response
     type: str

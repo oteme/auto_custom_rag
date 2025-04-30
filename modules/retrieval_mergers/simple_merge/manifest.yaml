@@ -1,0 +1,17 @@
+name: simple_merge
+type: retrieval_merger
+description: 指定された戦略（'concat' または 'unique'）に基づいてチャンクリストをマージする。
+inputs:
+  - name: chunks_list
+    type: list
+outputs:
+  - name: merged_chunks
+    type: list
+params:
+  - name: strategy
+    type: str
+    default: "concat"
+dependencies: []
+author: "Auto-Generated"
+license: "MIT"
+version: "1.0.0"

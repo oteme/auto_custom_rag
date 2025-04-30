@@ -1,0 +1,14 @@
+name: score_max_merge
+type: retrieval_merger
+description: 複数のRetrieverから得られたチャンクリストをマージし、重複するチャンクの中から最もスコアが高いものを選択するマージャー。
+inputs:
+  - name: chunks_list
+    type: list[dict]
+outputs:
+  - name: merged_chunks
+    type: list[dict]
+params: []
+dependencies: []
+author: "Auto-Generated"
+license: "MIT"
+version: "1.0.0"

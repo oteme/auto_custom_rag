@@ -1,15 +1,14 @@
-# /modules/rerankers/dummy_reranker/__init__.py
 name: dummy_reranker
 type: reranker
-description: チャンクリストとクエリを受け取り、チャンクの文字数に基づいて昇順に並び替える（リランキングする）ダミーのリランカー。
+description: クエリに関係なく、チャンクの文字数順（昇順）に並び替えるダミーのリランカー。
 inputs:
   - name: chunks
-    type: list[str]
+    type: list
   - name: query
     type: str
 outputs:
   - name: reranked_chunks
-    type: list[str]
+    type: list
 params: []
 dependencies: []
 author: "Auto-Generated"

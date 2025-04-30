@@ -1,12 +1,11 @@
-# /modules/prompts/simple_prompt_template/__init__.py
 name: simple_prompt_template
 type: prompt_template
-description: クエリとコンテキストチャンク（文字列または辞書形式）を受け取り、固定のテンプレートに基づいてモデルへの入力プロンプトを生成する。
+description: クエリとコンテキストチャンクを受け取り、シンプルな形式のプロンプト文字列を生成するテンプレート。
 inputs:
   - name: query
     type: str
   - name: context_chunks
-    type: list[any] # list[str] or list[dict]
+    type: list
 outputs:
   - name: prompt
     type: str

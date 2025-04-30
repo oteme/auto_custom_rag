@@ -1,0 +1,14 @@
+name: score_average_merge
+type: retrieval_merger
+description: 複数のRetrieverから得られたチャンクリストをマージし、重複するチャンクのスコアを平均化するマージャー。
+inputs:
+  - name: chunks_list
+    type: list[dict]
+outputs:
+  - name: merged_chunks
+    type: list[dict]
+params: []
+dependencies: []
+author: "Auto-Generated"
+license: "MIT"
+version: "1.0.0"

@@ -2,7 +2,7 @@
 from registry import ModuleRegistry
 
 class CLIAdapter:
-    def __init__(self, manager, dialogue, **_):
+    def __init__(self, dialogue, **_):
         self.dialogue = dialogue
 
     def run(self):

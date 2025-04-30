@@ -1,7 +1,6 @@
-# /modules/parsers/simple_parser/__init__.py
 name: simple_parser
 type: parser
-description: 生のドキュメントを受け取り、単純に固定の文字列を追加してパースするパーサー。
+description: 入力された生ドキュメントに対して単純なパース（ダミー）を行うパーサー。
 inputs:
   - name: raw_doc
     type: str

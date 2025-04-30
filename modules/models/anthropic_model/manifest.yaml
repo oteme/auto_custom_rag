@@ -1,7 +1,6 @@
-# /modules/models/anthropic_model/__init__.py
 name: anthropic_model
 type: model
-description: Anthropic API (Claude) を使用して、与えられたプロンプトに対する応答を生成するモデル。APIキーはパラメータまたは環境変数から取得。
+description: Anthropic API (Claude) を使用してテキスト生成を行うモデル。APIキーはパラメータまたは環境変数から取得。
 inputs:
   - name: prompt
     type: str
@@ -17,12 +16,9 @@ params:
     default: 0.7
   - name: api_key
     type: str
-    default: null # kwargs経由で渡される
-  - name: generation_kwargs # その他のAPIパラメータ用
-    type: dict
-    default: {}
+    default: null
 dependencies:
-  - python-dotenv
+  - dotenv
   - anthropic
 author: "Auto-Generated"
 license: "MIT"

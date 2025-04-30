@@ -1,7 +1,6 @@
-# /modules/embedders/simple_embedder/__init__.py
 name: simple_embedder
 type: embedder
-description: チャンクを受け取り、指定された次元数のランダムなベクトル（数値リスト）を生成するシンプルなエンベッダー。
+description: 指定された次元数のランダムなベクトルを生成するシンプルなエンベッダー。
 inputs:
   - name: chunk
     type: str

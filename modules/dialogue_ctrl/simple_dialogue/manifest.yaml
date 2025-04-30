@@ -1,0 +1,20 @@
+name: simple_dialogue
+type: dialogue_ctrl
+description: 会話履歴を管理し、設定されたフローに基づいて Manager の run_flow を呼び出すシンプルな対話コントローラー。
+inputs:
+  - name: user_msg
+    type: str
+outputs:
+  - name: answer
+    type: str
+params:
+  - name: manager
+    type: object
+    default: null
+  - name: session_manager
+    type: object
+    default: null
+dependencies: []
+author: "Auto-Generated"
+license: "MIT"
+version: "1.0.0"

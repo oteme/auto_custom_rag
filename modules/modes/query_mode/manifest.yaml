@@ -1,20 +1,12 @@
-# /modules/modes/query_mode/__init__.py
 name: query_mode
 type: mode
-description: 一度だけユーザーからのクエリを受け付け、関連情報を検索し、モデルに応答を生成させ、最終結果を表示する実行モード。
-inputs: # runメソッド内での標準入力
-  - name: user_query
-    type: str
-outputs: # runメソッド内での標準出力
-  - name: response
-    type: str
+description: CLI で単一のクエリを入力し、RAG パイプラインを実行して結果を表示するモード。
+inputs: [] # run() は内部で入力を受け付ける
+outputs: [] # run() は内部で標準出力に書き出す
 params:
-  - name: manager # 必須だが型は実行時依存
+  - name: manager
     type: object
     default: null
-  - name: kwargs # その他のパラメータ用
-    type: dict
-    default: {}
 dependencies: []
 author: "Auto-Generated"
 license: "MIT"

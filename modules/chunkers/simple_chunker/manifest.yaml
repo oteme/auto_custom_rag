@@ -1,7 +1,6 @@
-# /modules/chunkers/simple_chunker/__init__.py
 name: simple_chunker
 type: chunker
-description: 正規化されたドキュメントを受け取り、単純に固定の文字列を追加して2つのチャンクに分割するチャンカー。
+description: 入力された正規化済みドキュメントを単純に2つのチャンクに分割するチャンカー。
 inputs:
   - name: normalized_doc
     type: str

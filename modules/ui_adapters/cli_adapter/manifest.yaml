@@ -1,15 +1,15 @@
-name: chat_mode
-type: mode
-description: CLI で対話形式のチャットを実行するモード。内部で DialogueController を使用する。
+name: cli_adapter
+type: ui_adapter
+description: コマンドラインインターフェースを提供し、ユーザー入力と対話コントローラーを接続するUIアダプター。
 inputs: [] # run() は内部で入力を受け付ける
 outputs: [] # run() は内部で標準出力に書き出す
 params:
   - name: manager
     type: object
     default: null
-  - name: dialogue_controller
-    type: str
-    default: "simple_dialogue"
+  - name: dialogue
+    type: object
+    default: null
 dependencies: []
 author: "Auto-Generated"
 license: "MIT"

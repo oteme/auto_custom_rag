@@ -1,15 +1,14 @@
-# /modules/filters/simple_filter/__init__.py
 name: simple_filter
 type: filter
-description: チャンクリスト（文字列または辞書形式）とクエリを受け取り、チャンクのテキスト部分（小文字）にクエリ（小文字）が含まれるもののみをフィルタリングする。該当がない場合は元のリストを返すシンプルなフィルター。
+description: クエリに含まれるキーワードがチャンクテキスト（小文字変換後）に含まれるチャンクをフィルタリングする。
 inputs:
   - name: chunks
-    type: list[any] # list[str] or list[dict]
+    type: list
   - name: query
     type: str
 outputs:
   - name: filtered_chunks
-    type: list[any]
+    type: list
 params: []
 dependencies: []
 author: "Auto-Generated"

@@ -12,7 +12,7 @@
 - 出力は**厳密な YAML** で、次のキーを必ず含めること
 ```yaml
 name: <モジュールの一意識別子>
-type: <loader|parser|normalizer|chunker|embedder|retriever|filter|reranker|prompt_template|postprocessor|model|session_manager|mode>
+type: <loader|parser|normalizer|chunker|embedder|retriever|filter|reranker|prompt_template|postprocessor|model|session_manager|mode|retrieval_merger|ui_adapter|dialogue_ctrl>
 description: <詳細で実用的な日本語説明>
 inputs:
   - name: <入力名>

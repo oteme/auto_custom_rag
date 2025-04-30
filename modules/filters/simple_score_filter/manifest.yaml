@@ -1,0 +1,19 @@
+name: simple_score_filter
+type: filter
+description: (チャンク, スコア) のタプルのリストを受け取り、スコアが指定された閾値以上のチャンクのみをフィルタリングする。
+inputs:
+  - name: chunks_with_scores
+    type: list[tuple[any, float]]
+  - name: query
+    type: str | None
+outputs:
+  - name: filtered_chunks
+    type: list
+params:
+  - name: threshold
+    type: float
+    default: 0.5
+dependencies: []
+author: "Auto-Generated"
+license: "MIT"
+version: "1.0.0"
